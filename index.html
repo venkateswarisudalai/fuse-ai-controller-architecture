@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Fuse.AI Controller — Architecture</title>
+<title>Fuse.AI Controller · Architecture</title>
 <style>
   :root{
     --ink:#22262a; --ink-soft:#4a5158;
@@ -53,7 +53,7 @@
   .diagram-scroll{overflow-x:auto;background:var(--panel);border:1px solid var(--line);padding:18px}
   .diagram{min-width:900px;display:grid;grid-template-columns:190px minmax(0,1fr) 190px;gap:9px 12px}
   .r1{grid-row:1}.r2{grid-row:2}.r3{grid-row:3}.r4{grid-row:4}.r5{grid-row:5}
-  .r6{grid-row:6}.r7{grid-row:7}.r8{grid-row:8}.r9{grid-row:9}.r10{grid-row:10}.r11{grid-row:11}
+  .r6{grid-row:6}.r7{grid-row:7}.r8{grid-row:8}.r9{grid-row:9}.r10{grid-row:10}.r11{grid-row:11}.r12{grid-row:12}.r13{grid-row:13}
   .c2{grid-column:2/3}
 
   .blk{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--panel);padding:10px 13px;cursor:pointer;transition:opacity .25s,box-shadow .15s,transform .15s}
@@ -75,14 +75,17 @@
   .b-edge .tag{background:var(--green-soft);color:var(--green)}
   .b-field{grid-column:2/3;background:var(--paper)}
   .b-hw{grid-column:1/-1;text-align:center;font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--ink-soft);border:1px dashed var(--line);padding:7px;background:var(--panel)}
-  .rail-data{grid-column:1/2;grid-row:3/12;border-top:3px solid var(--blue)}
-  .rail-sec{grid-column:3/4;grid-row:3/12;border-top:3px solid var(--red)}
+  .rail-data{grid-column:1/2;grid-row:3/14;border-top:3px solid var(--blue)}
+  .rail-sec{grid-column:3/4;grid-row:3/14;border-top:3px solid var(--red)}
   .rail-data .naive,.rail-sec .naive{margin-top:8px}
 
   .conn{grid-column:2/3;display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
   .flow{font-family:var(--mono);font-size:10.5px;padding:2px 9px;white-space:nowrap}
   .flow.cmd{background:var(--amber-soft);color:var(--amber);border:1px solid #ecd3ac}
   .flow.tel{background:var(--blue-soft);color:var(--blue);border:1px solid #c3d5e5}
+  .flow.warn{background:var(--red-soft);color:var(--red);border:1px solid #ecc9c1}
+  .b-orch{background:var(--blue-soft);border-color:#a9c6e0}
+  .b-orch .tag{background:#fff;color:var(--blue)}
   .conn{align-items:center}
   .arr{flex:none;color:#d9a75e}
   td.t0{background:var(--red-soft)}td.t1{background:var(--amber-soft)}td.t2{background:var(--blue-soft)}td.t3{background:var(--green-soft)}
@@ -166,10 +169,10 @@
 <header>
   <div>
     <div class="eyebrow">Fuse Power Management · Senior AI Engineer exercise</div>
-    <h1>Fuse.AI Controller — proposed architecture</h1>
-    <p class="sub">EV fleets as dispatchable grid resources. One diagram — click any block to go deeper.</p>
+    <h1>Fuse.AI Controller: proposed architecture</h1>
+    <p class="sub">EV fleets as dispatchable grid resources. One diagram. Click any block to go deeper.</p>
   </div>
-  <div class="meta">Venkateswari · 2 Jul 2026<br>rev 0.4</div>
+  <div class="meta">Venkateswari · 2 Jul 2026<br>rev 0.5</div>
 </header>
 
 <p class="thesis">AI only forecasts. A deterministic solver builds the schedule, a rules gate checks every command at issue time, and site hardware is the last line. AI never touches a command path.</p>
@@ -212,45 +215,53 @@
 
     <button class="blk b-ext r1" id="L-ext" data-detail="ext">
       <span class="ttl">External world <span class="plus">+</span></span>
-      <span class="naive">The utility, the fleet office, the vehicles — each speaking a different protocol.</span>
+      <span class="naive">The utility, the fleet office, the vehicles, each speaking a different protocol.</span>
     </button>
 
     <div class="conn r2"><svg class="arr" width="22" height="30" viewBox="0 0 22 30" aria-hidden="true"><line x1="11" y1="1" x2="11" y2="22" stroke="currentColor" stroke-width="2"/><path d="M4 20 L11 29 L18 20" fill="none" stroke="currentColor" stroke-width="2"/></svg><span class="flow tel">▼ signals · schedules · telemetry</span><span class="flow tel">▲ dispatch confirmation · M&amp;V evidence</span></div>
 
-    <button class="blk b-ai c2 r3" id="L-ai" data-detail="ai">
-      <span class="ttl">AI forecasts <span class="plus">+</span></span>
-      <span class="naive">Predicts departures, energy needs, prices — with uncertainty bands.</span>
-      <span class="tag">predicts — never commands</span>
+    <button class="blk b-orch c2 r3" id="L-orch" data-detail="orch">
+      <span class="ttl">Orchestrator <span class="plus">+</span></span>
+      <span class="naive">Routes every incoming event: the slow planning loop, or the 60-second fast path.</span>
+      <span class="tag">routes by event</span>
     </button>
 
-    <div class="conn r4"><svg class="arr" width="22" height="30" viewBox="0 0 22 30" aria-hidden="true"><line x1="11" y1="1" x2="11" y2="22" stroke="currentColor" stroke-width="2"/><path d="M4 20 L11 29 L18 20" fill="none" stroke="currentColor" stroke-width="2"/></svg><span class="flow tel">▼ forecasts (inputs only)</span></div>
+    <div class="conn r4"><svg class="arr" width="22" height="30" viewBox="0 0 22 30" aria-hidden="true"><line x1="11" y1="1" x2="11" y2="22" stroke="currentColor" stroke-width="2"/><path d="M4 20 L11 29 L18 20" fill="none" stroke="currentColor" stroke-width="2"/></svg><span class="flow tel">▼ plan cycle (5–15 min) → forecasts</span><span class="flow warn">DR dispatch (60 s) → fast path, straight to the site edge</span></div>
 
-    <button class="blk b-opt c2 r5" id="L-opt" data-detail="opt">
-      <span class="ttl">Optimizer — math decides <span class="plus">+</span></span>
+    <button class="blk b-ai c2 r5" id="L-ai" data-detail="ai">
+      <span class="ttl">AI forecasts <span class="plus">+</span></span>
+      <span class="naive">Predicts departures, energy needs, and prices, with uncertainty bands.</span>
+      <span class="tag">predicts, never commands</span>
+    </button>
+
+    <div class="conn r6"><svg class="arr" width="22" height="30" viewBox="0 0 22 30" aria-hidden="true"><line x1="11" y1="1" x2="11" y2="22" stroke="currentColor" stroke-width="2"/><path d="M4 20 L11 29 L18 20" fill="none" stroke="currentColor" stroke-width="2"/></svg><span class="flow tel">▼ forecasts (inputs only)</span></div>
+
+    <button class="blk b-opt c2 r7" id="L-opt" data-detail="opt">
+      <span class="ttl">Optimizer · math decides <span class="plus">+</span></span>
       <span class="naive">A solver turns forecasts into the fleet plan; every hard rule lives inside it.</span>
       <span class="tag">MILP day-ahead · MPC intra-day</span>
     </button>
 
-    <div class="conn r6"><svg class="arr" width="22" height="30" viewBox="0 0 22 30" aria-hidden="true"><line x1="11" y1="1" x2="11" y2="22" stroke="currentColor" stroke-width="2"/><path d="M4 20 L11 29 L18 20" fill="none" stroke="currentColor" stroke-width="2"/></svg><span class="flow cmd">▼ candidate schedule</span></div>
+    <div class="conn r8"><svg class="arr" width="22" height="30" viewBox="0 0 22 30" aria-hidden="true"><line x1="11" y1="1" x2="11" y2="22" stroke="currentColor" stroke-width="2"/><path d="M4 20 L11 29 L18 20" fill="none" stroke="currentColor" stroke-width="2"/></svg><span class="flow cmd">▼ candidate schedule</span></div>
 
-    <button class="blk b-gate c2 r7" id="L-gate" data-detail="gate">
+    <button class="blk b-gate c2 r9" id="L-gate" data-detail="gate">
       <span class="ttl">Rules gate <span class="plus">+</span></span>
-      <span class="naive">The checkpoint every command must pass — AI, solver, or human alike.</span>
+      <span class="naive">The checkpoint every command must pass: AI, solver, or human alike.</span>
       <span class="tag">the deterministic boundary</span>
     </button>
 
-    <div class="conn r8"><svg class="arr" width="22" height="30" viewBox="0 0 22 30" aria-hidden="true"><line x1="11" y1="1" x2="11" y2="22" stroke="currentColor" stroke-width="2"/><path d="M4 20 L11 29 L18 20" fill="none" stroke="currentColor" stroke-width="2"/></svg><span class="flow cmd">▼ validated · signed · epoch-fenced</span><span class="flow tel">▶ every verdict → audit log</span></div>
+    <div class="conn r10"><svg class="arr" width="22" height="30" viewBox="0 0 22 30" aria-hidden="true"><line x1="11" y1="1" x2="11" y2="22" stroke="currentColor" stroke-width="2"/><path d="M4 20 L11 29 L18 20" fill="none" stroke="currentColor" stroke-width="2"/></svg><span class="flow cmd">▼ validated · signed · epoch-fenced</span><span class="flow tel">▶ every verdict → audit log</span></div>
 
-    <button class="blk b-edge c2 r9" id="L-edge" data-detail="edge">
+    <button class="blk b-edge c2 r11" id="L-edge" data-detail="edge">
       <span class="ttl">Site edge <span class="plus">+</span></span>
       <span class="naive">Keeps every site safe even if the cloud disappears.</span>
       <span class="tag">dispatch execution · no AI · no optimizer</span>
     </button>
 
-    <div class="conn r10"><svg class="arr" width="22" height="30" viewBox="0 0 22 30" aria-hidden="true"><line x1="11" y1="1" x2="11" y2="22" stroke="currentColor" stroke-width="2"/><path d="M4 20 L11 29 L18 20" fill="none" stroke="currentColor" stroke-width="2"/></svg><span class="flow cmd">▼ OCPP profiles</span><span class="flow tel">▲ meter values · charger status → telemetry store</span></div>
+    <div class="conn r12"><svg class="arr" width="22" height="30" viewBox="0 0 22 30" aria-hidden="true"><line x1="11" y1="1" x2="11" y2="22" stroke="currentColor" stroke-width="2"/><path d="M4 20 L11 29 L18 20" fill="none" stroke="currentColor" stroke-width="2"/></svg><span class="flow cmd">▼ OCPP profiles</span><span class="flow tel">▲ meter values · charger status → telemetry store</span></div>
 
-    <button class="blk b-field r11" id="L-field" data-detail="field">
-      <span class="ttl">Field — chargers &amp; EVs <span class="plus">+</span></span>
+    <button class="blk b-field r13" id="L-field" data-detail="field">
+      <span class="ttl">Field · chargers &amp; EVs <span class="plus">+</span></span>
       <span class="naive">Multi-vendor hardware, multiple dialects (OCPP, ISO 15118, telematics).</span>
     </button>
 
@@ -264,41 +275,41 @@
       <span class="naive">Identity, signed commands, anomaly detection, replayable audit records.</span>
     </button>
 
-    <div class="b-hw" id="L-hw">LAST LINE — certified hardware protection (UL 1741 SB / IEEE 1547) · no software state can exceed the panel rating</div>
+    <div class="b-hw" id="L-hw">LAST LINE · certified hardware protection (UL 1741 SB / IEEE 1547) · no software state can exceed the panel rating</div>
 
   </div>
 </div>
 
 <div class="print-scen" aria-hidden="true">
   <h2>Failure walk-throughs (interactive on the web version)</h2>
-  <h3>F1 — Cloud dies / plan goes stale</h3>
+  <h3>F1 · Cloud dies / plan goes stale</h3>
   <ol>
-    <li>The plan watchdog at the site edge expires — no fresh schedule from the cloud.</li>
+    <li>The plan watchdog at the site edge expires. No fresh schedule is coming from the cloud.</li>
     <li>Chargers revert to the pre-staged default: charge toward departure, fair share within the cap, never export. Positioned before the outage, not computed during it.</li>
-    <li>The site cap is enforced locally — it never depended on the cloud. Certified hardware sits below even that.</li>
+    <li>The site cap is enforced locally; it never depended on the cloud. Certified hardware sits below even that.</li>
     <li>Outcome: no vehicle stranded because the brain died. Grid services pause; fleet operations don't.</li>
   </ol>
-  <h3>F2 — Utility demands response in 60 seconds</h3>
+  <h3>F2 · Utility demands response in 60 seconds</h3>
   <ol>
     <li>A DERMS dispatch lands mid-interval: shed 400 kW, starting in 60 seconds.</li>
-    <li>The edge responds immediately from pre-planned headroom — headroom exists because the day-ahead bid was conservative (~P10).</li>
+    <li>The edge responds immediately from pre-planned headroom, which exists because the day-ahead bid was conservative (~P10).</li>
     <li>In parallel, an out-of-cycle MPC re-solve re-plans the rest of the day. The solver is never on the 60-second path.</li>
-    <li>New commands re-enter through the rules gate — revalidated against live state, epoch-fenced so stale commands are dropped.</li>
-    <li>Outcome: dispatch delivered and measured — delivered ÷ committed kWh per event. That's the ≥90% metric, with evidence.</li>
+    <li>New commands re-enter through the rules gate, revalidated against live state and epoch-fenced so stale commands are dropped.</li>
+    <li>Outcome: dispatch delivered and measured as delivered ÷ committed kWh per event. That is the ≥90% metric, with evidence.</li>
   </ol>
-  <h3>F3 — Impossible night: no valid plan exists</h3>
+  <h3>F3 · Impossible night: no valid plan exists</h3>
   <ol>
     <li>The fleet arrives two hours late with low batteries. Departure charge + site cap + tonight's commitment cannot all hold.</li>
     <li>The solver returns an infeasible subset (IIS): the 400 kW commitment, 12 departures, and the 600 kW cap cannot all hold. An AI loop would have iterated and timed out.</li>
     <li>Relaxation runs bottom-up: the utility commitment is partially curtailed at its real tariff-penalty price. Departures win.</li>
-    <li>Outcome: the operator gets a named conflict, not a mystery — and every relaxation is logged.</li>
+    <li>Outcome: the operator sees exactly which constraints clash, and every relaxation is logged.</li>
   </ol>
 </div>
 
 <div class="cards">
   <button class="card-btn" data-detail="loop">
     <span class="ttl">Why not AI-in-a-loop? <span class="plus">+</span></span>
-    <span class="naive">My first sketch — and the three reasons I demoted it.</span>
+    <span class="naive">My first sketch, and the three reasons I demoted it.</span>
   </button>
   <button class="card-btn" data-detail="numbers">
     <span class="ttl">Numbers &amp; scope cuts <span class="plus">+</span></span>
@@ -312,7 +323,7 @@
 
 <footer>
   <span>Fuse.AI Controller · architecture proposal · discussion draft</span>
-  <span>interactive version — print this page for the static copy</span>
+  <span>interactive version; print this page for the static copy</span>
 </footer>
 </div>
 
@@ -328,20 +339,32 @@
     <div class="detail" data-key="ext">
       <h2 id="d-ext">External world</h2>
       <p class="naive-line">Everyone the platform talks to.</p>
-      <p class="why"><b>Why it's hard:</b> every party speaks a different protocol. Vendor-neutrality — one platform fluent in all of them — is the product.</p>
+      <p class="why"><b>Why it's hard:</b> every party speaks a different protocol. Vendor neutrality (one platform fluent in all of them) is the product.</p>
       <div class="chips">
         <span class="chip">Utility / DERMS<small>OpenADR 2.0b · IEEE 2030.5 · DR events · dispatch confirmation</small></span>
         <span class="chip">Fleet operations<small>routes · departure schedules · manual overrides</small></span>
         <span class="chip">OEM telematics<small>BMS SoC · location · plug state</small></span>
         <span class="chip">Tariffs &amp; weather<small>price signals · load drivers</small></span>
-        <span class="chip">Conflicting utility signals<small>explicit precedence policy — not improvisation</small></span>
+        <span class="chip">Conflicting utility signals<small>explicit precedence policy · not improvisation</small></span>
+      </div>
+    </div>
+
+    <div class="detail" data-key="orch">
+      <h2>Orchestrator</h2>
+      <p class="naive-line">One router decides which path an event takes; nothing else needs to know.</p>
+      <p class="why"><b>Two speeds:</b> plan-cycle events go through forecasts, the optimizer, and the gate. A DERMS dispatch demanding action in 60 seconds skips all of that; the site edge answers from pre-planned headroom, and the planners catch up on the next cycle.</p>
+      <div class="chips">
+        <span class="chip">Event: plan cycle<small>every 5–15 min · forecasts → optimizer → rules gate</small></span>
+        <span class="chip">Event: DR dispatch<small>60 s · fast path to the site edge · no solver, no AI</small></span>
+        <span class="chip">Event: telemetry<small>meter values · charger status → data plane</small></span>
+        <span class="chip">Signal precedence<small>conflicting utility signals resolve by explicit policy</small></span>
       </div>
     </div>
 
     <div class="detail" data-key="ai">
       <h2>AI forecasts</h2>
       <p class="naive-line">Forecasts only. Outputs are solver inputs, never commands.</p>
-      <p class="why"><b>The key decision:</b> forecasts are allowed to be wrong — uncertainty bands price that in. Commands are not, so AI output stops at the solver's input. (My first sketch had AI proposing schedules; see “Why not AI-in-a-loop?”)</p>
+      <p class="why"><b>The key decision:</b> forecasts are allowed to be wrong; uncertainty bands price that in. Commands are not, so AI output stops at the solver's input. (My first sketch had AI proposing schedules; see "Why not AI-in-a-loop?")</p>
       <div class="chips">
         <span class="chip">Departure time<small>per vehicle · quantile bands</small></span>
         <span class="chip">Energy need<small>per route / vehicle</small></span>
@@ -352,9 +375,9 @@
     </div>
 
     <div class="detail" data-key="opt">
-      <h2>Optimizer — math decides</h2>
-      <p class="naive-line">Every hard limit is a constraint the solver must satisfy simultaneously — or it reports exactly which ones conflict.</p>
-      <p class="why"><b>Why a solver, not the AI:</b> every hard constraint here is linear or piecewise-linear, so a MILP satisfies them <em>provably</em> — and when no valid plan exists, it returns an irreducible infeasible subset (IIS) — a minimal set of constraints that cannot all hold. An AI loop can only time out.</p>
+      <h2>Optimizer · math decides</h2>
+      <p class="naive-line">Every hard limit is a constraint the solver must satisfy simultaneously, or it reports exactly which ones conflict.</p>
+      <p class="why"><b>Why a solver, not the AI:</b> every hard constraint here is linear or piecewise-linear, so a MILP satisfies them <em>provably</em>. When no valid plan exists it returns an irreducible infeasible subset (IIS): a minimal set of constraints that cannot all hold. An AI loop can only time out.</p>
       <div class="chips">
         <span class="chip">Day-ahead MILP<small>daily + on event · 15-min × 24–36 h · commitment bid at ~P10 flexibility</small></span>
         <span class="chip">Intra-day MPC<small>re-solve every 5–15 min · warm-started · live SoC / arrivals / DERMS</small></span>
@@ -363,50 +386,50 @@
       <table>
         <thead><tr><th>Tier</th><th>Constraint</th><th>Posture</th></tr></thead>
         <tbody>
-          <tr><td class="tier t0">T0</td><td>Site electrical safety · battery physics</td><td>Never relaxed — enforced at edge + hardware</td></tr>
+          <tr><td class="tier t0">T0</td><td>Site electrical safety · battery physics</td><td>Never relaxed · enforced at edge + hardware</td></tr>
           <tr><td class="tier t1">T1</td><td>OEM warranty budgets</td><td>Hard in software · budget-shaped · reservation ledger</td></tr>
-          <tr><td class="tier t2">T2</td><td>Departure SoC targets</td><td>Soft, high penalty — stranding &gt; dispatch miss</td></tr>
-          <tr><td class="tier t3">T3</td><td>Utility commitments</td><td>Soft — penalty = actual tariff $</td></tr>
+          <tr><td class="tier t2">T2</td><td>Departure SoC targets</td><td>Soft, high penalty · stranding &gt; dispatch miss</td></tr>
+          <tr><td class="tier t3">T3</td><td>Utility commitments</td><td>Soft · penalty = actual tariff $</td></tr>
         </tbody>
       </table>
-      <p class="naive-line" style="margin-top:10px">Infeasible → relax bottom-up (T3 first), report the named conflict. T2 &gt; T3 is a judgment call — see “Assumptions &amp; positions taken.”</p>
+      <p class="naive-line" style="margin-top:10px">Infeasible → relax bottom-up (T3 first), report the named conflict. T2 &gt; T3 is a judgment call; see "Assumptions &amp; positions taken."</p>
     </div>
 
     <div class="detail" data-key="gate">
-      <h2>Rules gate — the deterministic boundary</h2>
+      <h2>Rules gate: the deterministic boundary</h2>
       <p class="naive-line">Nothing reaches a charger without crossing this line.</p>
-      <p class="why"><b>Why two checks:</b> a plan validated at 4:00 can be unsafe at 4:07 — a van unplugged, building load spiked. So the gate checks the plan <em>and</em> re-checks every command at the moment it's issued.</p>
+      <p class="why"><b>Why two checks:</b> a plan validated at 4:00 can be unsafe at 4:07: a van unplugged, building load spiked. So the gate checks the plan <em>and</em> re-checks every command at the moment it's issued.</p>
       <div class="chips">
-        <span class="chip">Plan-time validation<small>+ ≤2 bounded repair passes — what survived of the rejected loop</small></span>
+        <span class="chip">Plan-time validation<small>+ ≤2 bounded repair passes · what survived of the rejected loop</small></span>
         <span class="chip">Admission control at actuation<small>each command re-checked vs LIVE state</small></span>
         <span class="chip">Epoch fencing<small>commands from a stale plan generation are dropped</small></span>
-        <span class="chip">Constraint DSL<small>rules written once, versioned — feeds solver + validator so they can't drift</small></span>
-        <span class="chip">Margin-tightened limits<small>optimizer sees ~90% of true caps — no fence-riding</small></span>
+        <span class="chip">Constraint DSL<small>rules written once, versioned · feeds solver + validator so they can't drift</small></span>
+        <span class="chip">Margin-tightened limits<small>optimizer sees ~90% of true caps · no fence-riding</small></span>
         <span class="chip">Human override lane<small>through the gate, never around it</small></span>
-        <span class="chip">Warranty reservation ledger<small>validate reserves budget · execution commits — no double-spend</small></span>
+        <span class="chip">Warranty reservation ledger<small>validate reserves budget · execution commits · no double-spend</small></span>
       </div>
     </div>
 
     <div class="detail" data-key="edge">
       <h2>Site edge</h2>
       <p class="naive-line">A small computer at each depot. No AI, no optimizer, bounded latency.</p>
-      <p class="why"><b>The fallback insight:</b> a fallback isn't computed during an outage — it's pre-positioned before one. Even a fully compromised cloud cannot overload a site.</p>
+      <p class="why"><b>The fallback insight:</b> a fallback isn't computed during an outage. It's pre-positioned before one. Even a fully compromised cloud cannot overload a site.</p>
       <div class="chips">
-        <span class="chip">Site controller<small>enforces the electrical cap locally — zero cloud dependency</small></span>
-        <span class="chip">Dispatch engine<small>split on purpose: gate does admission, edge executes — see “Cloud dies”</small></span>
+        <span class="chip">Site controller<small>enforces the electrical cap locally · zero cloud dependency</small></span>
+        <span class="chip">Dispatch engine<small>split on purpose: gate does admission, edge executes · see "Cloud dies"</small></span>
         <span class="chip">Setpoint follower<small>per-charger OCPP SetChargingProfile · charger status monitoring</small></span>
-        <span class="chip">Pre-staged safe default<small>“charge to departure, fair share, never export” — already on every charger</small></span>
+        <span class="chip">Pre-staged safe default<small>"charge to departure, fair share, never export" · already on every charger</small></span>
         <span class="chip">Terminal safe state<small>pause bidirectional flow · alert</small></span>
       </div>
     </div>
 
     <div class="detail" data-key="field">
-      <h2>Field — chargers &amp; EVs</h2>
+      <h2>Field · chargers &amp; EVs</h2>
       <p class="naive-line">The hardware reality check.</p>
-      <p class="why"><b>Honesty point:</b> the installed base is mostly OCPP 1.6J, where security profiles are rarely implemented in practice. Discharge setpoints are only standardized in OCPP 2.1 / ISO 15118-20; 2.0.1 needs vendor extensions — the pilot is scoped accordingly.</p>
+      <p class="why"><b>Honesty point:</b> the installed base is mostly OCPP 1.6J, where security profiles are rarely implemented in practice. Discharge setpoints are only standardized in OCPP 2.1 / ISO 15118-20; 2.0.1 needs vendor extensions, so the pilot is scoped accordingly.</p>
       <div class="chips">
         <span class="chip">Chargers<small>OCPP 2.0.1 SP2/3 where supported · 1.6J behind a hardened gateway · status + fault monitoring (StatusNotification)</small></span>
-        <span class="chip">EVs<small>ISO 15118 / telematics · capability registry per pair — many are charge-only</small></span>
+        <span class="chip">EVs<small>ISO 15118 / telematics · capability registry per pair · many are charge-only</small></span>
         <span class="chip">Site meter · building load</span>
       </div>
     </div>
@@ -419,7 +442,7 @@
         <span class="chip">Ingestion<small>OCPP head-end (CSMS) + telematics collectors → event bus</small></span>
         <span class="chip">Time-series telemetry store<small>~33 msg/s at 2k EVSE · sized for reconnect storms</small></span>
         <span class="chip">SoC estimation service<small>fuses OCPP meter energy + BMS SoC</small></span>
-        <span class="chip">M&amp;V<small>delivered ÷ committed kWh per utility event — how “≥90% dispatch success” is measured</small></span>
+        <span class="chip">M&amp;V<small>delivered ÷ committed kWh per utility event · how "≥90% dispatch success" is measured</small></span>
         <span class="chip">Dashboards<small>operator + customer</small></span>
         <span class="chip">Driver-data minimization<small>departure predictions are behavioral data (GDPR/CCPA)</small></span>
       </div>
@@ -432,8 +455,8 @@
       <div class="chips">
         <span class="chip">Identity &amp; access<small>RBAC/SSO for operators · scoped service credentials per component</small></span>
         <span class="chip">Signed commands<small>HSM-backed keys · EVSE certificate lifecycle</small></span>
-        <span class="chip">Telemetry plausibility checks<small>poisoned-SoC containment — rate-of-change + energy reconciliation</small></span>
-        <span class="chip">Aggregate constraints<small>fleet ramp-rate + direction-flip limits — legal commands must not sum to a grid attack</small></span>
+        <span class="chip">Telemetry plausibility checks<small>poisoned-SoC containment · rate-of-change + energy reconciliation</small></span>
+        <span class="chip">Aggregate constraints<small>fleet ramp-rate + direction-flip limits · legal commands must not sum to a grid attack</small></span>
         <span class="chip">Out-of-band kill switch<small>per site + fleet-wide</small></span>
         <span class="chip">Two-person change control<small>on the constraint DSL</small></span>
         <span class="chip">WORM decision records<small>input snapshot hash · model + constraint versions · verdicts replayable bit-for-bit</small></span>
@@ -446,17 +469,18 @@
       <h2>Why not AI-in-a-loop?</h2>
       <p class="naive-line">My first sketch: AI proposes a schedule → rules engine flags violations → AI re-proposes → repeat until compliant.</p>
       <ul>
-        <li><b>No infeasibility certificate.</b> The loop can't tell “not found yet” from “doesn't exist” — it burns iterations and gives up. A solver returns the conflicting constraint set (IIS).</li>
-        <li><b>Oscillation where the money is.</b> With tight coupled constraints (site cap + commitment + departures — the revenue regime), fixing one violation creates another.</li>
+        <li><b>No infeasibility certificate.</b> The loop can't tell "not found yet" from "none exists". It burns iterations and gives up. A solver returns the conflicting constraint set (IIS).</li>
+        <li><b>Oscillation where the money is.</b> With tight coupled constraints (site cap + commitment + departures, the revenue regime), fixing one violation creates another.</li>
         <li><b>The fallback paradox.</b> A fallback good enough to hold ≥90% dispatch success <em>is</em> a deterministic scheduler. You'd maintain two planners and trust one.</li>
       </ul>
-      <div class="rejected"><b>Verdict:</b> rejected as the primary mechanism — the problem is a textbook constrained optimization.</div>
+      <p>The reference example routes an analytics request through a ReAct loop that refines a query until it succeeds. That shape fits there because retries are cheap and success is easy to check. Power dispatch offers neither, so the loop moved.</p>
+      <div class="rejected"><b>Verdict:</b> rejected as the primary mechanism; the problem is a textbook constrained optimization.</div>
       <div class="kept"><b>What survived:</b> a bounded ≤2-pass repair step at the rules gate, as an escape hatch for formulation gaps. For v1 I'd consider cutting even that.</div>
     </div>
 
     <div class="detail" data-key="numbers">
       <h2>Numbers &amp; scope cuts</h2>
-      <p class="naive-line">What this design is sized for — and what I deferred for the 4pm deadline.</p>
+      <p class="naive-line">What this design is sized for, and what I deferred for the 4pm deadline.</p>
       <table>
         <thead><tr><th>Working number</th><th class="num">Value</th></tr></thead>
         <tbody>
@@ -482,12 +506,12 @@
 
     <div class="detail" data-key="questions">
       <h2>Assumptions &amp; positions taken</h2>
-      <p class="naive-line">These are business-shaped calls. I took a position on each rather than leave the design underspecified; each is validated with real data, not opinion.</p>
+      <p class="naive-line">These are business-shaped calls. I took a position on each rather than leave the design underspecified, and each one is checked against real data.</p>
       <dl class="qa">
         <dt>1 · Constraint shedding order</dt>
-        <dd><b>Position:</b> departure SoC outranks utility commitments — stranding a van costs more than a dispatch penalty. Validated against actual tariff penalty structures and fleet SLAs.</dd>
+        <dd><b>Position:</b> departure SoC outranks utility commitments; stranding a van costs more than a dispatch penalty. Validated against actual tariff penalty structures and fleet SLAs.</dd>
         <dt>2 · Warranty enforcement acceptance</dt>
-        <dd><b>Assumption:</b> “software-enforced warranty compliance” eventually needs written OEM acceptance of the enforcement logic. Until then, the per-VIN ledger is the evidence base.</dd>
+        <dd><b>Assumption:</b> "software-enforced warranty compliance" eventually needs written OEM acceptance of the enforcement logic. Until then, the per-VIN ledger is the evidence base.</dd>
         <dt>3 · Human override semantics</dt>
         <dd><b>Position:</b> overrides go through the gate, never around it. Which role unlocks which tier (site manager vs fleet HQ) is deployment configuration, not architecture.</dd>
         <dt>4 · Commitment aggressiveness</dt>
@@ -561,23 +585,23 @@
   /* ---------- scenario player ---------- */
   var SCEN={
     f1:{name:'CLOUD DIES / PLAN GOES STALE',steps:[
-      {ids:['L-edge'],t:'The plan watchdog at the site edge expires — no fresh schedule from the cloud.'},
+      {ids:['L-edge'],t:'The plan watchdog at the site edge expires. No fresh schedule is coming from the cloud.'},
       {ids:['L-edge','L-field'],t:'Chargers revert to the pre-staged default: charge toward departure, fair share within the cap, never export. Positioned before the outage, not computed during it.'},
-      {ids:['L-edge','L-hw'],t:'The site cap is enforced locally — it never depended on the cloud. Certified hardware sits below even that.'},
+      {ids:['L-edge','L-hw'],t:'The site cap is enforced locally; it never depended on the cloud. Certified hardware sits below even that.'},
       {ids:['L-field'],t:'Outcome: no vehicle stranded because the brain died. Grid services pause; fleet operations don’t.'}
     ]},
     f2:{name:'UTILITY DEMANDS RESPONSE IN 60 SECONDS',steps:[
-      {ids:['L-ext'],t:'A DERMS dispatch lands mid-interval: shed 400 kW, starting in 60 seconds.'},
-      {ids:['L-edge'],t:'The edge responds immediately from pre-planned headroom — headroom exists because the day-ahead bid was conservative (~P10).'},
+      {ids:['L-ext','L-orch'],t:'A DERMS dispatch lands mid-interval: shed 400 kW, starting in 60 seconds. The orchestrator routes it to the fast path.'},
+      {ids:['L-edge'],t:'The edge responds immediately from pre-planned headroom, which exists because the day-ahead bid was conservative (~P10).'},
       {ids:['L-opt'],t:'In parallel, an out-of-cycle MPC re-solve re-plans the rest of the day. The solver is never on the 60-second path.'},
-      {ids:['L-gate'],t:'New commands re-enter through the rules gate — revalidated against live state, epoch-fenced so stale commands are dropped.'},
-      {ids:['L-data'],t:'Outcome: dispatch delivered and measured — delivered ÷ committed kWh per event. That’s the ≥90% metric, with evidence.'}
+      {ids:['L-gate'],t:'New commands re-enter through the rules gate, revalidated against live state and epoch-fenced so stale commands are dropped.'},
+      {ids:['L-data'],t:'Outcome: dispatch delivered and measured as delivered ÷ committed kWh per event. That is the ≥90% metric, with evidence.'}
     ]},
-    f3:{name:'IMPOSSIBLE NIGHT — NO VALID PLAN EXISTS',steps:[
+    f3:{name:'IMPOSSIBLE NIGHT: NO VALID PLAN EXISTS',steps:[
       {ids:['L-field'],t:'The fleet arrives two hours late with low batteries. Departure charge + site cap + tonight’s commitment cannot all hold.'},
       {ids:['L-opt'],t:'The solver returns an infeasible subset (IIS): the 400 kW commitment, 12 departures, and the 600 kW cap cannot all hold. An AI loop would have iterated and timed out.'},
       {ids:['L-opt','L-ext'],t:'Relaxation runs bottom-up: the utility commitment is partially curtailed at its real tariff-penalty price. Departures win.'},
-      {ids:['L-sec','L-data'],t:'Outcome: the operator gets a named conflict, not a mystery — and every relaxation is logged.'}
+      {ids:['L-sec','L-data'],t:'Outcome: the operator sees exactly which constraints clash, and every relaxation is logged.'}
     ]}
   };
   var diagram=document.getElementById('diagram');
@@ -593,7 +617,7 @@
     var s=SCEN[cur], step=s.steps[idx];
     clearLit();
     step.ids.forEach(function(id){var el=document.getElementById(id);if(el){el.classList.add('lit');}});
-    narrK.textContent=s.name+' — step '+(idx+1)+' of '+s.steps.length;
+    narrK.textContent=s.name+' · step '+(idx+1)+' of '+s.steps.length;
     narrT.textContent=step.t;
     btnPrev.disabled=(idx===0);
     btnNext.disabled=(idx===s.steps.length-1);
